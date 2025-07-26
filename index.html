@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Loan & Equity Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for better scrolling on small screens */
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            border: 1px solid #e2e8f0;
+        }
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .tab-button.active {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e0e7ff; /* Indigo 100 */
+            color: #4f46e5;
+        }
+        .input-field {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e0; /* Gray 300 */
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2d3748; /* Gray 800 */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo 500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        .calculate-button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #10b981; /* Emerald 500 */
+            color: white;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .calculate-button:hover {
+            background-color: #059669; /* Emerald 600 */
+            transform: translateY(-2px);
+        }
+        .result-box {
+            background-color: #f8fafc; /* Blue Gray 50 */
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4a5568; /* Gray 700 */
+        }
+        .result-value {
+            font-weight: 700;
+            color: #2d3748; /* Gray 800 */
+        }
+        .total-emi {
+            font-size: 1.75rem; /* text-3xl */
+            color: #4f46e5; /* Indigo 600 */
+            font-weight: 800;
+            text-align: center;
+            margin-top: 16px;
+        }
+        .disclaimer {
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* Gray 500 */
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #fffbeb; /* Amber 50 */
+            border-left: 4px solid #f59e0b; /* Amber 500 */
+            border-radius: 8px;
+        }
+        .error-message {
+            color: #ef4444; /* Red 500 */
+            font-size: 0.875rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Loan & Equity Calculator</h1>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center gap-4 mb-8">
+            <button id="newLoanTab" class="tab-button active">New Home Loan EMI</button>
+            <button id="equityTab" class="tab-button">Existing Property Equity</button>
+        </div>
+
+        <!-- New Home Loan Calculator Section -->
+        <div id="newLoanSection" class="calculator-section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculate New Home Loan EMI</h2>
+            <form id="newLoanForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="housePrice" class="block text-sm font-medium text-gray-700 mb-1">House Price ($)</label>
+                    <input type="number" id="housePrice" class="input-field" placeholder="e.g., 750000" required>
+                </div>
+                <div>
+                    <label for="downPayment" class="block text-sm font-medium text-gray-700 mb-1">Down Payment (incl. taxes) ($)</label>
+                    <input type="number" id="downPayment" class="input-field" placeholder="e.g., 150000" required>
+                </div>
+                <div>
+                    <label for="loanTerm" class="block text-sm font-medium text-gray-700 mb-1">Loan Term (Years)</label>
+                    <select id="loanTerm" class="input-field" required>
+                        <option value="">Select Term</option>
+                        <option value="10">10 Years</option>
+                        <option value="15">15 Years</option>
+                        <option value="20">20 Years</option>
+                        <option value="25">25 Years</option>
+                        <option value="30">30 Years</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="interestRate" class="block text-sm font-medium text-gray-700 mb-1">Annual Interest Rate (%)</label>
+                    <input type="number" id="interestRate" class="input-field" step="0.01" placeholder="e.g., 6.5" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="australianState" class="block text-sm font-medium text-gray-700 mb-1">Property Location (Australia)</label>
+                    <select id="australianState" class="input-field">
+                        <option value="">Select State/Territory (for Stamp Duty Estimate)</option>
+                        <option value="NSW">New South Wales (NSW)</option>
+                        <option value="VIC">Victoria (VIC)</option>
+                        <option value="QLD">Queensland (QLD)</option>
+                        <option value="SA">South Australia (SA)</option>
+                        <option value="WA">Western Australia (WA)</option>
+                        <option value="TAS">Tasmania (TAS)</option>
+                        <option value="ACT">Australian Capital Territory (ACT)</option>
+                        <option value="NT">Northern Territory (NT)</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="calculate-button">Calculate EMI</button>
+                </div>
+            </form>
+            <div id="newLoanResults" class="result-box hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Loan Details & Costs</h3>
+                <div class="result-item">
+                    <span class="result-label">House Price:</span>
+                    <span id="outputHousePrice" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Down Payment:</span>
+                    <span id="outputDownPayment" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Loan Amount:</span>
+                    <span id="outputLoanAmount" class="result-value text-indigo-600"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Estimated Stamp Duty & Taxes:</span>
+                    <span id="outputStampDuty" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Estimated LMI:</span>
+                    <span id="outputLMI" class="result-value text-red-600"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Loan to Value Ratio (LVR):</span>
+                    <span id="outputLVR" class="result-value"></span>
+                </div>
+                <div class="total-emi">
+                    Monthly EMI: <span id="outputEMI"></span>
+                </div>
+                <p class="disclaimer">
+                    <strong>Disclaimer:</strong> All calculations for stamp duty, taxes, and LMI are highly simplified estimates for demonstration purposes only. Actual costs vary significantly by state, property type, buyer status, and lender. Please consult a financial advisor for accurate figures.
+                </p>
+            </div>
+            <p id="newLoanError" class="error-message hidden"></p>
+        </div>
+
+        <!-- Existing Property Equity Calculator Section -->
+        <div id="equitySection" class="calculator-section hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculate Existing Property Equity</h2>
+            <form id="equityForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="currentPropertyValue" class="block text-sm font-medium text-gray-700 mb-1">Estimated Current Property Value ($)</label>
+                    <input type="number" id="currentPropertyValue" class="input-field" placeholder="e.g., 800000" required>
+                </div>
+                <div>
+                    <label for="loanRemaining" class="block text-sm font-medium text-gray-700 mb-1">Remaining Loan Balance ($)</label>
+                    <input type="number" id="loanRemaining" class="input-field" placeholder="e.g., 400000" required>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="calculate-button">Calculate Equity</button>
+                </div>
+            </form>
+            <div id="equityResults" class="result-box hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Equity Details</h3>
+                <div class="result-item">
+                    <span class="result-label">Estimated Property Value:</span>
+                    <span id="outputCurrentPropertyValue" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Remaining Loan Balance:</span>
+                    <span id="outputLoanRemaining" class="result-value"></span>
+                </div>
+                <div class="total-emi">
+                    Available Equity: <span id="outputEquity"></span>
+                </div>
+                <p class="disclaimer">
+                    <strong>Refinance Option:</strong> With available equity, you might be able to refinance your loan for better rates, consolidate debt, or access funds for other purposes. Consult a financial advisor to explore your options.
+                </p>
+            </div>
+            <p id="equityError" class="error-message hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        // --- Helper Functions ---
+
+        /**
+         * Formats a number as Australian currency.
+         * @param {number} amount
+         * @returns {string}
+         */
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(amount);
+        }
+
+        /**
+         * Displays an error message.
+         * @param {string} message - The error message.
+         * @param {HTMLElement} errorElement - The HTML element to display the error in.
+         */
+        function displayError(message, errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        /**
+         * Clears an error message.
+         * @param {HTMLElement} errorElement - The HTML element containing the error.
+         */
+        function clearError(errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.add('hidden');
+        }
+
+        // --- Tab Switching Logic ---
+        const newLoanTab = document.getElementById('newLoanTab');
+        const equityTab = document.getElementById('equityTab');
+        const newLoanSection = document.getElementById('newLoanSection');
+        const equitySection = document.getElementById('equitySection');
+
+        function showSection(sectionToShow) {
+            newLoanSection.classList.add('hidden');
+            equitySection.classList.add('hidden');
+            newLoanTab.classList.remove('active');
+            equityTab.classList.remove('active');
+
+            if (sectionToShow === 'newLoan') {
+                newLoanSection.classList.remove('hidden');
+                newLoanTab.classList.add('active');
+            } else if (sectionToShow === 'equity') {
+                equitySection.classList.remove('hidden');
+                equityTab.classList.add('active');
+            }
+            // Hide results and errors when switching tabs
+            document.getElementById('newLoanResults').classList.add('hidden');
+            document.getElementById('newLoanError').classList.add('hidden');
+            document.getElementById('equityResults').classList.add('hidden');
+            document.getElementById('equityError').classList.add('hidden');
+        }
+
+        newLoanTab.addEventListener('click', () => showSection('newLoan'));
+        equityTab.addEventListener('click', () => showSection('equity'));
+
+        // --- New Home Loan Calculator Logic ---
+        const newLoanForm = document.getElementById('newLoanForm');
+        const housePriceInput = document.getElementById('housePrice');
+        const downPaymentInput = document.getElementById('downPayment');
+        const loanTermInput = document.getElementById('loanTerm');
+        const interestRateInput = document.getElementById('interestRate');
+        const australianStateSelect = document.getElementById('australianState');
+        const newLoanResultsDiv = document.getElementById('newLoanResults');
+        const newLoanErrorDiv = document.getElementById('newLoanError');
+
+        // Output elements
+        const outputHousePrice = document.getElementById('outputHousePrice');
+        const outputDownPayment = document.getElementById('outputDownPayment');
+        const outputLoanAmount = document.getElementById('outputLoanAmount');
+        const outputStampDuty = document.getElementById('outputStampDuty');
+        const outputLMI = document.getElementById('outputLMI');
+        const outputLVR = document.getElementById('outputLVR');
+        const outputEMI = document.getElementById('outputEMI');
+
+        // Simplified Stamp Duty Rates (as a percentage of property value)
+        // DISCLAIMER: These are highly generalized and may not reflect actual current rates or specific exemptions/concessions.
+        const STAMP_DUTY_RATES = {
+            'NSW': 0.045, // ~4.5%
+            'VIC': 0.055, // ~5.5%
+            'QLD': 0.035, // ~3.5%
+            'SA': 0.04,  // ~4.0%
+            'WA': 0.03,  // ~3.0%
+            'TAS': 0.035, // ~3.5%
+            'ACT': 0.038, // ~3.8%
+            'NT': 0.04   // ~4.0%
+        };
+
+        // Simplified LMI Rates (as a percentage of loan amount)
+        // DISCLAIMER: LMI is complex and varies greatly by lender, LVR, and loan size. This is a very rough estimate.
+        function calculateLMI(loanAmount, housePrice) {
+            const lvr = (loanAmount / housePrice) * 100;
+            let lmiRate = 0;
+
+            if (lvr > 90) {
+                lmiRate = 0.025; // 2.5% of loan amount
+            } else if (lvr > 80) {
+                lmiRate = 0.015; // 1.5% of loan amount
+            }
+            return loanAmount * lmiRate;
+        }
+
+        newLoanForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            clearError(newLoanErrorDiv);
+            newLoanResultsDiv.classList.add('hidden');
+
+            const housePrice = parseFloat(housePriceInput.value);
+            const downPayment = parseFloat(downPaymentInput.value);
+            const loanTermYears = parseInt(loanTermInput.value);
+            const annualInterestRate = parseFloat(interestRateInput.value);
+            const selectedState = australianStateSelect.value;
+
+            // Input Validation
+            if (isNaN(housePrice) || housePrice <= 0 ||
+                isNaN(downPayment) || downPayment < 0 ||
+                isNaN(loanTermYears) || loanTermYears <= 0 ||
+                isNaN(annualInterestRate) || annualInterestRate <= 0) {
+                displayError('Please enter valid positive numbers for all fields.', newLoanErrorDiv);
+                return;
+            }
+
+            if (downPayment >= housePrice) {
+                displayError('Down payment cannot be greater than or equal to the house price for a loan calculation.', newLoanErrorDiv);
+                return;
+            }
+
+            const loanAmount = housePrice - downPayment;
+            const monthlyInterestRate = (annualInterestRate / 100) / 12;
+            const totalPayments = loanTermYears * 12;
+
+            // EMI Calculation
+            let emi = 0;
+            if (monthlyInterestRate === 0) {
+                emi = loanAmount / totalPayments; // Simple division if interest rate is 0
+            } else {
+                emi = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) /
+                      (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+            }
+
+            // Stamp Duty Calculation
+            const stampDutyRate = STAMP_DUTY_RATES[selectedState] || 0; // Default to 0 if no state selected or rate not found
+            const estimatedStampDuty = housePrice * stampDutyRate;
+
+            // LMI Calculation
+            const lmi = calculateLMI(loanAmount, housePrice);
+            const lvr = (loanAmount / housePrice) * 100;
+
+            // Display Results
+            outputHousePrice.textContent = formatCurrency(housePrice);
+            outputDownPayment.textContent = formatCurrency(downPayment);
+            outputLoanAmount.textContent = formatCurrency(loanAmount);
+            outputStampDuty.textContent = formatCurrency(estimatedStampDuty);
+            outputLMI.textContent = formatCurrency(lmi);
+            outputLVR.textContent = `${lvr.toFixed(2)}%`;
+            outputEMI.textContent = formatCurrency(emi);
+
+            newLoanResultsDiv.classList.remove('hidden');
+        });
+
+        // --- Existing Property Equity Calculator Logic ---
+        const equityForm = document.getElementById('equityForm');
+        const currentPropertyValueInput = document.getElementById('currentPropertyValue');
+        const loanRemainingInput = document.getElementById('loanRemaining');
+        const equityResultsDiv = document.getElementById('equityResults');
+        const equityErrorDiv = document.getElementById('equityError');
+
+        // Output elements
+        const outputCurrentPropertyValue = document.getElementById('outputCurrentPropertyValue');
+        const outputLoanRemaining = document.getElementById('outputLoanRemaining');
+        const outputEquity = document.getElementById('outputEquity');
+
+        equityForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            clearError(equityErrorDiv);
+            equityResultsDiv.classList.add('hidden');
+
+            const currentPropertyValue = parseFloat(currentPropertyValueInput.value);
+            const loanRemaining = parseFloat(loanRemainingInput.value);
+
+            // Input Validation
+            if (isNaN(currentPropertyValue) || currentPropertyValue <= 0 ||
+                isNaN(loanRemaining) || loanRemaining < 0) {
+                displayError('Please enter valid positive numbers for all fields.', equityErrorDiv);
+                return;
+            }
+
+            if (loanRemaining > currentPropertyValue) {
+                displayError('Remaining loan balance cannot be greater than the property value.', equityErrorDiv);
+                return;
+            }
+
+            const availableEquity = currentPropertyValue - loanRemaining;
+
+            // Display Results
+            outputCurrentPropertyValue.textContent = formatCurrency(currentPropertyValue);
+            outputLoanRemaining.textContent = formatCurrency(loanRemaining);
+            outputEquity.textContent = formatCurrency(availableEquity);
+
+            equityResultsDiv.classList.remove('hidden');
+        });
+
+        // Initialize with the New Loan section visible
+        showSection('newLoan');
+    </script>
+</body>
+</html>
