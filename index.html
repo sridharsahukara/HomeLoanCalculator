@@ -33,6 +33,7 @@
             transition: all 0.2s ease-in-out;
             cursor: pointer;
             border: 1px solid transparent;
+            white-space: nowrap; /* Prevent wrapping on small screens */
         }
         .tab-button.active {
             background-color: #4f46e5; /* Indigo 600 */
@@ -128,9 +129,11 @@
         <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Loan & Equity Calculator</h1>
 
         <!-- Tab Navigation -->
-        <div class="flex justify-center gap-4 mb-8">
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
             <button id="newLoanTab" class="tab-button active">New Home Loan EMI</button>
             <button id="equityTab" class="tab-button">Existing Property Equity</button>
+            <button id="personalLoanTab" class="tab-button">Personal Loan</button>
+            <button id="carLoanTab" class="tab-button">Car Loan</button>
         </div>
 
         <!-- New Home Loan Calculator Section -->
@@ -189,12 +192,16 @@
                     <span id="outputDownPayment" class="result-value"></span>
                 </div>
                 <div class="result-item">
-                    <span class="result-label">Loan Amount:</span>
-                    <span id="outputLoanAmount" class="result-value text-indigo-600"></span>
-                </div>
-                <div class="result-item">
                     <span class="result-label">Estimated Stamp Duty & Taxes:</span>
                     <span id="outputStampDuty" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Property Cost (incl. taxes):</span>
+                    <span id="outputTotalPropertyCost" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Loan Amount:</span>
+                    <span id="outputLoanAmount" class="result-value text-indigo-600"></span>
                 </div>
                 <div class="result-item">
                     <span class="result-label">Estimated LMI:</span>
@@ -249,6 +256,108 @@
             </div>
             <p id="equityError" class="error-message hidden"></p>
         </div>
+
+        <!-- Personal Loan Calculator Section -->
+        <div id="personalLoanSection" class="calculator-section hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculate Personal Loan EMI</h2>
+            <form id="personalLoanForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="personalLoanAmount" class="block text-sm font-medium text-gray-700 mb-1">Loan Amount ($)</label>
+                    <input type="number" id="personalLoanAmount" class="input-field" placeholder="e.g., 20000" required>
+                </div>
+                <div>
+                    <label for="personalLoanTerm" class="block text-sm font-medium text-gray-700 mb-1">Loan Term (Years)</label>
+                    <select id="personalLoanTerm" class="input-field" required>
+                        <option value="">Select Term</option>
+                        <option value="1">1 Year</option>
+                        <option value="2">2 Years</option>
+                        <option value="3">3 Years</option>
+                        <option value="4">4 Years</option>
+                        <option value="5">5 Years</option>
+                        <option value="7">7 Years</option>
+                        <option value="10">10 Years</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="personalInterestRate" class="block text-sm font-medium text-gray-700 mb-1">Annual Interest Rate (%)</label>
+                    <input type="number" id="personalInterestRate" class="input-field" step="0.01" placeholder="e.g., 12.5" required>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="calculate-button">Calculate EMI</button>
+                </div>
+            </form>
+            <div id="personalLoanResults" class="result-box hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Personal Loan Details</h3>
+                <div class="result-item">
+                    <span class="result-label">Loan Amount:</span>
+                    <span id="outputPersonalLoanAmount" class="result-value text-indigo-600"></span>
+                </div>
+                <div class="total-emi">
+                    Monthly EMI: <span id="outputPersonalEMI"></span>
+                </div>
+                <p class="disclaimer">
+                    <strong>Disclaimer:</strong> This is a simplified personal loan EMI calculator. Actual loan terms, rates, and fees may vary. Consult a financial institution for precise figures.
+                </p>
+            </div>
+            <p id="personalLoanError" class="error-message hidden"></p>
+        </div>
+
+        <!-- Car Loan Calculator Section -->
+        <div id="carLoanSection" class="calculator-section hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculate Car Loan EMI</h2>
+            <form id="carLoanForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="carPrice" class="block text-sm font-medium text-gray-700 mb-1">Car Price ($)</label>
+                    <input type="number" id="carPrice" class="input-field" placeholder="e.g., 40000" required>
+                </div>
+                <div>
+                    <label for="carDownPayment" class="block text-sm font-medium text-gray-700 mb-1">Down Payment ($)</label>
+                    <input type="number" id="carDownPayment" class="input-field" placeholder="e.g., 5000" required>
+                </div>
+                <div>
+                    <label for="carLoanTerm" class="block text-sm font-medium text-gray-700 mb-1">Loan Term (Years)</label>
+                    <select id="carLoanTerm" class="input-field" required>
+                        <option value="">Select Term</option>
+                        <option value="1">1 Year</option>
+                        <option value="2">2 Years</option>
+                        <option value="3">3 Years</option>
+                        <option value="4">4 Years</option>
+                        <option value="5">5 Years</option>
+                        <option value="6">6 Years</option>
+                        <option value="7">7 Years</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="carInterestRate" class="block text-sm font-medium text-gray-700 mb-1">Annual Interest Rate (%)</label>
+                    <input type="number" id="carInterestRate" class="input-field" step="0.01" placeholder="e.g., 7.99" required>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="calculate-button">Calculate EMI</button>
+                </div>
+            </form>
+            <div id="carLoanResults" class="result-box hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Car Loan Details</h3>
+                <div class="result-item">
+                    <span class="result-label">Car Price:</span>
+                    <span id="outputCarPrice" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Down Payment:</span>
+                    <span id="outputCarDownPayment" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Loan Amount:</span>
+                    <span id="outputCarLoanAmount" class="result-value text-indigo-600"></span>
+                </div>
+                <div class="total-emi">
+                    Monthly EMI: <span id="outputCarEMI"></span>
+                </div>
+                <p class="disclaimer">
+                    <strong>Disclaimer:</strong> This is a simplified car loan EMI calculator. Actual loan terms, rates, and fees may vary. Consult a financial institution for precise figures.
+                </p>
+            </div>
+            <p id="carLoanError" class="error-message hidden"></p>
+        </div>
     </div>
 
     <script>
@@ -282,34 +391,81 @@
             errorElement.classList.add('hidden');
         }
 
+        /**
+         * Calculates EMI based on principal, annual interest rate, and loan term.
+         * @param {number} principal - The loan amount.
+         * @param {number} annualInterestRate - Annual interest rate in percentage (e.g., 6.5).
+         * @param {number} loanTermYears - Loan term in years.
+         * @returns {number} The calculated monthly EMI.
+         */
+        function calculateEMI(principal, annualInterestRate, loanTermYears) {
+            const monthlyInterestRate = (annualInterestRate / 100) / 12;
+            const totalPayments = loanTermYears * 12;
+
+            if (monthlyInterestRate === 0) {
+                return principal / totalPayments; // Simple division if interest rate is 0
+            } else {
+                return (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) /
+                       (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+            }
+        }
+
         // --- Tab Switching Logic ---
         const newLoanTab = document.getElementById('newLoanTab');
         const equityTab = document.getElementById('equityTab');
+        const personalLoanTab = document.getElementById('personalLoanTab');
+        const carLoanTab = document.getElementById('carLoanTab');
+
         const newLoanSection = document.getElementById('newLoanSection');
         const equitySection = document.getElementById('equitySection');
+        const personalLoanSection = document.getElementById('personalLoanSection');
+        const carLoanSection = document.getElementById('carLoanSection');
+
 
         function showSection(sectionToShow) {
+            // Hide all sections
             newLoanSection.classList.add('hidden');
             equitySection.classList.add('hidden');
+            personalLoanSection.classList.add('hidden');
+            carLoanSection.classList.add('hidden');
+
+            // Deactivate all tab buttons
             newLoanTab.classList.remove('active');
             equityTab.classList.remove('active');
+            personalLoanTab.classList.remove('active');
+            carLoanTab.classList.remove('active');
 
+            // Hide all results and errors
+            document.getElementById('newLoanResults').classList.add('hidden');
+            document.getElementById('newLoanError').classList.add('hidden');
+            document.getElementById('equityResults').classList.add('hidden');
+            document.getElementById('equityError').classList.add('hidden');
+            document.getElementById('personalLoanResults').classList.add('hidden');
+            document.getElementById('personalLoanError').classList.add('hidden');
+            document.getElementById('carLoanResults').classList.add('hidden');
+            document.getElementById('carLoanError').classList.add('hidden');
+
+            // Show the selected section and activate its button
             if (sectionToShow === 'newLoan') {
                 newLoanSection.classList.remove('hidden');
                 newLoanTab.classList.add('active');
             } else if (sectionToShow === 'equity') {
                 equitySection.classList.remove('hidden');
                 equityTab.classList.add('active');
+            } else if (sectionToShow === 'personalLoan') {
+                personalLoanSection.classList.remove('hidden');
+                personalLoanTab.classList.add('active');
+            } else if (sectionToShow === 'carLoan') {
+                carLoanSection.classList.remove('hidden');
+                carLoanTab.classList.add('active');
             }
-            // Hide results and errors when switching tabs
-            document.getElementById('newLoanResults').classList.add('hidden');
-            document.getElementById('newLoanError').classList.add('hidden');
-            document.getElementById('equityResults').classList.add('hidden');
-            document.getElementById('equityError').classList.add('hidden');
         }
 
         newLoanTab.addEventListener('click', () => showSection('newLoan'));
         equityTab.addEventListener('click', () => showSection('equity'));
+        personalLoanTab.addEventListener('click', () => showSection('personalLoan'));
+        carLoanTab.addEventListener('click', () => showSection('carLoan'));
+
 
         // --- New Home Loan Calculator Logic ---
         const newLoanForm = document.getElementById('newLoanForm');
@@ -324,6 +480,7 @@
         // Output elements
         const outputHousePrice = document.getElementById('outputHousePrice');
         const outputDownPayment = document.getElementById('outputDownPayment');
+        const outputTotalPropertyCost = document.getElementById('outputTotalPropertyCost'); // New output
         const outputLoanAmount = document.getElementById('outputLoanAmount');
         const outputStampDuty = document.getElementById('outputStampDuty');
         const outputLMI = document.getElementById('outputLMI');
@@ -377,37 +534,32 @@
                 return;
             }
 
-            if (downPayment >= housePrice) {
-                displayError('Down payment cannot be greater than or equal to the house price for a loan calculation.', newLoanErrorDiv);
-                return;
-            }
-
-            const loanAmount = housePrice - downPayment;
-            const monthlyInterestRate = (annualInterestRate / 100) / 12;
-            const totalPayments = loanTermYears * 12;
-
-            // EMI Calculation
-            let emi = 0;
-            if (monthlyInterestRate === 0) {
-                emi = loanAmount / totalPayments; // Simple division if interest rate is 0
-            } else {
-                emi = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) /
-                      (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
-            }
-
-            // Stamp Duty Calculation
+            // Stamp Duty Calculation (moved up to be included in total cost)
             const stampDutyRate = STAMP_DUTY_RATES[selectedState] || 0; // Default to 0 if no state selected or rate not found
             const estimatedStampDuty = housePrice * stampDutyRate;
 
+            const totalPropertyCost = housePrice + estimatedStampDuty;
+
+            if (downPayment > totalPropertyCost) { // Down payment can be equal to total cost if no loan is needed
+                displayError('Down payment cannot be greater than the total property cost (including taxes).', newLoanErrorDiv);
+                return;
+            }
+
+            const loanAmount = totalPropertyCost - downPayment;
+
+            // EMI Calculation
+            const emi = calculateEMI(loanAmount, annualInterestRate, loanTermYears);
+
             // LMI Calculation
-            const lmi = calculateLMI(loanAmount, housePrice);
+            const lmi = calculateLMI(loanAmount, housePrice); // LMI is based on loan amount vs original house price
             const lvr = (loanAmount / housePrice) * 100;
 
             // Display Results
             outputHousePrice.textContent = formatCurrency(housePrice);
             outputDownPayment.textContent = formatCurrency(downPayment);
-            outputLoanAmount.textContent = formatCurrency(loanAmount);
             outputStampDuty.textContent = formatCurrency(estimatedStampDuty);
+            outputTotalPropertyCost.textContent = formatCurrency(totalPropertyCost);
+            outputLoanAmount.textContent = formatCurrency(loanAmount);
             outputLMI.textContent = formatCurrency(lmi);
             outputLVR.textContent = `${lvr.toFixed(2)}%`;
             outputEMI.textContent = formatCurrency(emi);
@@ -455,6 +607,93 @@
             outputEquity.textContent = formatCurrency(availableEquity);
 
             equityResultsDiv.classList.remove('hidden');
+        });
+
+        // --- Personal Loan Calculator Logic ---
+        const personalLoanForm = document.getElementById('personalLoanForm');
+        const personalLoanAmountInput = document.getElementById('personalLoanAmount');
+        const personalLoanTermInput = document.getElementById('personalLoanTerm');
+        const personalInterestRateInput = document.getElementById('personalInterestRate');
+        const personalLoanResultsDiv = document.getElementById('personalLoanResults');
+        const personalLoanErrorDiv = document.getElementById('personalLoanError');
+
+        // Output elements
+        const outputPersonalLoanAmount = document.getElementById('outputPersonalLoanAmount');
+        const outputPersonalEMI = document.getElementById('outputPersonalEMI');
+
+        personalLoanForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            clearError(personalLoanErrorDiv);
+            personalLoanResultsDiv.classList.add('hidden');
+
+            const loanAmount = parseFloat(personalLoanAmountInput.value);
+            const loanTermYears = parseInt(personalLoanTermInput.value);
+            const annualInterestRate = parseFloat(personalInterestRateInput.value);
+
+            // Input Validation
+            if (isNaN(loanAmount) || loanAmount <= 0 ||
+                isNaN(loanTermYears) || loanTermYears <= 0 ||
+                isNaN(annualInterestRate) || annualInterestRate <= 0) {
+                displayError('Please enter valid positive numbers for all fields.', personalLoanErrorDiv);
+                return;
+            }
+
+            const emi = calculateEMI(loanAmount, annualInterestRate, loanTermYears);
+
+            // Display Results
+            outputPersonalLoanAmount.textContent = formatCurrency(loanAmount);
+            outputPersonalEMI.textContent = formatCurrency(emi);
+            personalLoanResultsDiv.classList.remove('hidden');
+        });
+
+        // --- Car Loan Calculator Logic ---
+        const carLoanForm = document.getElementById('carLoanForm');
+        const carPriceInput = document.getElementById('carPrice');
+        const carDownPaymentInput = document.getElementById('carDownPayment');
+        const carLoanTermInput = document.getElementById('carLoanTerm');
+        const carInterestRateInput = document.getElementById('carInterestRate');
+        const carLoanResultsDiv = document.getElementById('carLoanResults');
+        const carLoanErrorDiv = document.getElementById('carLoanError');
+
+        // Output elements
+        const outputCarPrice = document.getElementById('outputCarPrice');
+        const outputCarDownPayment = document.getElementById('outputCarDownPayment');
+        const outputCarLoanAmount = document.getElementById('outputCarLoanAmount');
+        const outputCarEMI = document.getElementById('outputCarEMI');
+
+        carLoanForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            clearError(carLoanErrorDiv);
+            carLoanResultsDiv.classList.add('hidden');
+
+            const carPrice = parseFloat(carPriceInput.value);
+            const downPayment = parseFloat(carDownPaymentInput.value);
+            const loanTermYears = parseInt(carLoanTermInput.value);
+            const annualInterestRate = parseFloat(carInterestRateInput.value);
+
+            // Input Validation
+            if (isNaN(carPrice) || carPrice <= 0 ||
+                isNaN(downPayment) || downPayment < 0 ||
+                isNaN(loanTermYears) || loanTermYears <= 0 ||
+                isNaN(annualInterestRate) || annualInterestRate <= 0) {
+                displayError('Please enter valid positive numbers for all fields.', carLoanErrorDiv);
+                return;
+            }
+
+            if (downPayment >= carPrice) {
+                displayError('Down payment cannot be greater than or equal to the car price for a loan calculation.', carLoanErrorDiv);
+                return;
+            }
+
+            const loanAmount = carPrice - downPayment;
+            const emi = calculateEMI(loanAmount, annualInterestRate, loanTermYears);
+
+            // Display Results
+            outputCarPrice.textContent = formatCurrency(carPrice);
+            outputCarDownPayment.textContent = formatCurrency(downPayment);
+            outputCarLoanAmount.textContent = formatCurrency(loanAmount);
+            outputCarEMI.textContent = formatCurrency(emi);
+            carLoanResultsDiv.classList.remove('hidden');
         });
 
         // Initialize with the New Loan section visible
